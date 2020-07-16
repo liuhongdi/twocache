@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-@Profile("prod")   //prod这个profile时缓存才生效
+@Profile("cacheebale")   //prod这个profile时缓存才生效
 @Configuration
 @EnableCaching //开启缓存
 public class CacheConfig {

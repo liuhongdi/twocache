@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Aspect
-@Order(3)
+@Order(1)
 public class CostTimeAspect {
 
     ThreadLocal<Long> startTime = new ThreadLocal<>();

@@ -20,6 +20,7 @@ public class CacheConfig {
     public static final int DEFAULT_MAXSIZE = 10000;
     public static final int DEFAULT_TTL = 600;
 
+    private SimpleCacheManager cacheManager = new SimpleCacheManager();
 
     /**
      * 定义cache名称、超时时长（秒）、最大容量
@@ -48,17 +49,22 @@ public class CacheConfig {
     @Bean
     @Primary
     public CacheManager caffeineCacheManager() {
-        SimpleCacheManager cacheManager = new SimpleCacheManager();
+
         ArrayList<CaffeineCache> caches = new ArrayList<CaffeineCache>();
         for(CacheEnum c : CacheEnum.values()){
             caches.add(new CaffeineCache(c.name(),
                     Caffeine.newBuilder().recordStats()
                             .expireAfterWrite(c.getTtl(), TimeUnit.SECONDS)
-                            .maximumSize(c.getMaxSize())
-                            .build())
+                            .maximumSize(c.getMaxSize()).build())
+
             );
         }
         cacheManager.setCaches(caches);
+        return cacheManager;
+    }
+
+    @Bean
+    public CacheManager getCacheManager() {
         return cacheManager;
     }
 }

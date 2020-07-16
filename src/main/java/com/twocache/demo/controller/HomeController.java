@@ -8,9 +8,13 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +29,9 @@ public class HomeController {
     @Resource
     private GoodsService goodsService;
 
+    @Resource
+    private CacheManager cacheManager;
+
     //商品详情 参数:商品id
     @Cacheable(value = "goods", key="#goodsId",sync = true)
     @GetMapping("/goodsget")
@@ -34,5 +41,34 @@ public class HomeController {
         return goods;
     }
 
+    //统计，如果是生产环境，需要加密才允许访问
+    @GetMapping("/stats")
+    @ResponseBody
+    public Object stats() {
+
+        CaffeineCache caffeine = (CaffeineCache)cacheManager.getCache("goods");
+        Cache goods = caffeine.getNativeCache();
+        String statsInfo="cache名字:goods<br/>";
+        Long size = goods.estimatedSize();
+        statsInfo += "size:"+size+"<br/>";
+        ConcurrentMap map= goods.asMap();
+        statsInfo += "map keys:<br/>";
+        for(Object key : map.keySet()) {
+            statsInfo += "key:"+key.toString()+";value:"+map.get(key)+"<br/>";
+        }
+        statsInfo += "统计信息:"+goods.stats().toString();
+//遍历值
+        /*
+        for(Object value : map.values()) {
+            System.out.println("value = " + value);
+        }
+        Long key=3L;
+        Goods one = (Goods)goods.getIfPresent(key);
+        System.out.println(one.getGoodsName());
+        Goods one2 = (Goods)map.get(key);
+        System.out.println(one2.getGoodsName());
+        */
+        return statsInfo;
+    }
 }
 

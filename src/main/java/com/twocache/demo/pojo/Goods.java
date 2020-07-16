@@ -47,4 +47,8 @@ public class Goods {
     public void setStock(int stock) {
         this.stock = stock;
     }
+
+    public String toString(){
+        return " Goods:goodsId=" + goodsId +" goodsName=" + goodsName+" subject=" + subject+" price=" + price+" stock=" + stock;
+    }
 }

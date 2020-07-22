@@ -5,17 +5,10 @@ import com.twocache.demo.service.GoodsService;
 import com.github.benmanes.caffeine.cache.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.util.*;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.caffeine.CaffeineCache;
-import org.springframework.cache.support.SimpleCacheManager;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,17 +50,7 @@ public class HomeController {
             statsInfo += "key:"+key.toString()+";value:"+map.get(key)+"<br/>";
         }
         statsInfo += "统计信息:"+goods.stats().toString();
-//遍历值
-        /*
-        for(Object value : map.values()) {
-            System.out.println("value = " + value);
-        }
-        Long key=3L;
-        Goods one = (Goods)goods.getIfPresent(key);
-        System.out.println(one.getGoodsName());
-        Goods one2 = (Goods)map.get(key);
-        System.out.println(one2.getGoodsName());
-        */
+
         return statsInfo;
     }
 }

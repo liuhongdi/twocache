@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class GoodsServiceImpl implements GoodsService {
@@ -26,13 +27,15 @@ public class GoodsServiceImpl implements GoodsService {
     public Goods getOneGoodsById(Long goodsId) {
         Goods goodsOne;
         if (redis1enabled == 1) {
+            System.out.println("get data from redis");
             Object goodsr = redis1Template.opsForValue().get("goods_"+String.valueOf(goodsId));
             if (goodsr == null) {
+                System.out.println("get data from mysql");
                 goodsOne = goodsMapper.selectOneGoods(goodsId);
                 if (goodsOne == null) {
-                    redis1Template.opsForValue().set("goods_"+String.valueOf(goodsId),"-1");
+                    redis1Template.opsForValue().set("goods_"+String.valueOf(goodsId),"-1",600, TimeUnit.SECONDS);
                 } else {
-                    redis1Template.opsForValue().set("goods_"+String.valueOf(goodsId),goodsOne);
+                    redis1Template.opsForValue().set("goods_"+String.valueOf(goodsId),goodsOne,600, TimeUnit.SECONDS);
                 }
             } else {
                 if (goodsr.equals("-1")) {
@@ -42,6 +45,7 @@ public class GoodsServiceImpl implements GoodsService {
                 }
             }
         } else {
+            System.out.println("get data from mysql");
             goodsOne = goodsMapper.selectOneGoods(goodsId);
         }
         return goodsOne;

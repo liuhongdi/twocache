@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.Profile;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-@Profile("cacheebale")   //prod这个profile时缓存才生效
+@Profile("cacheenable")   //prod这个profile时缓存才生效
 @Configuration
 @EnableCaching //开启缓存
 public class CacheConfig {
@@ -22,12 +23,10 @@ public class CacheConfig {
 
     private SimpleCacheManager cacheManager = new SimpleCacheManager();
 
-    /**
-     * 定义cache名称、超时时长（秒）、最大容量
-     * 每个cache缺省：600秒超时、最多缓存10000条数据
-     */
+
+    //定义cache名称、超时时长（秒）、最大容量
     public enum CacheEnum{
-        goods(600,1000),          //有效期600秒
+        goods(60,1000),       //有效期600秒, 最大容量1000
         homePage(7200,1000),  //有效期2个小时 , 最大容量1000
         ;
         CacheEnum(int ttl, int maxSize) {
@@ -49,14 +48,12 @@ public class CacheConfig {
     @Bean
     @Primary
     public CacheManager caffeineCacheManager() {
-
         ArrayList<CaffeineCache> caches = new ArrayList<CaffeineCache>();
         for(CacheEnum c : CacheEnum.values()){
             caches.add(new CaffeineCache(c.name(),
                     Caffeine.newBuilder().recordStats()
                             .expireAfterWrite(c.getTtl(), TimeUnit.SECONDS)
                             .maximumSize(c.getMaxSize()).build())
-
             );
         }
         cacheManager.setCaches(caches);
